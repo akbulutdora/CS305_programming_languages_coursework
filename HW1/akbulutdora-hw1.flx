@@ -1,0 +1,67 @@
+tIDENT [_a-zA-Z][_a-zA-Z0-9]*
+tSTRING \"([^"]*)\"
+tMAIL Mail
+tSCHEDULE schedule
+tSEND send
+tFROM from
+tENDMAIL "end Mail"
+tENDSCH "end schedule"
+tTO to
+tSET set
+tCOMMA ","
+tCOLON ":"
+tLPR "("
+tRPR ")"
+tLBR "["
+tRBR "]"
+tAT "@"
+
+tADDRESS [a-zA-Z0-9_\-]+([\.][a-zA-Z0-9_\-]+)*@[a-zA-Z0-9]([\-a-zA-Z0-9]*[a-zA-Z0-9])*([\.][a-zA-Z0-9]([\-a-zA-Z0-9]*[a-zA-Z0-9])*){1,2}
+
+tDATE [0-9]{2}\/[0-9]{2}\/[0-9]{4}
+tTIME [0-9]{2}":"[0-9]{2}
+ int lineNo = 1;
+%%
+\n		lineNo++;
+{tTIME}		printf("%d tTIME (%s)\n", lineNo, yytext);
+{tDATE}		printf("%d tDATE (%s)\n", lineNo, yytext);
+{tSCHEDULE}	printf("%d tSCHEDULE\n", lineNo);
+{tADDRESS}	printf("%d tADDRESS (%s)\n", lineNo, yytext);
+{tMAIL}		printf("%d tMAIL\n", lineNo);
+{tSET}		printf("%d tSET\n", lineNo);
+{tCOMMA}	printf("%d tCOMMA\n", lineNo);
+{tCOLON}	printf("%d tCOLON\n", lineNo);
+{tAT}		printf("%d tAT\n", lineNo);
+{tRBR}		printf("%d tRBR\n", lineNo);
+{tLBR}		printf("%d tLBR\n", lineNo);
+{tRPR}		printf("%d tRPR\n", lineNo);
+{tLPR}		printf("%d tLPR\n", lineNo);
+{tTO}		printf("%d tTO\n", lineNo);
+{tENDSCH}	printf("%d tENDSCH\n", lineNo);
+{tENDMAIL}	printf("%d tENDMAIL\n", lineNo);
+{tSEND}		printf("%d tSEND\n", lineNo);
+{tFROM}		printf("%d tFROM\n", lineNo);
+{tSTRING}	{
+		char sub[1000];
+		int position = 2;
+		int length = yyleng - 2;
+		int c = 0;
+		while(c < length)
+		{
+			sub[c] = yytext[position+c-1];
+			c++;
+		}
+		sub[c] = '\0';
+
+		printf("%d tSTRING (%s)\n", lineNo,sub);
+
+		if (strchr(yytext, '\n')) lineNo++;
+		}
+{tIDENT}	printf("%d tIDENT (%s)\n", lineNo, yytext);
+" "
+.		printf("%d ILLEGAL CHARACTER (%s)\n", lineNo, yytext);
+%%
+int main()
+{
+	yylex();
+}
